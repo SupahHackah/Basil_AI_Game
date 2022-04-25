@@ -18,10 +18,18 @@ public class Test : MonoBehaviour
         this.transform.localScale /= 2f;
     }
 
-    [ContextMenu("Assign random color")] // For more complex stuff, look into proper editor scripting
-    public void RandomColor()
+    [ContextMenu("Start a function")] // For more complex stuff, look into proper editor scripting
+    public void SaF1()
     {
         //_sharedMat.color = Random.ColorHSV();
+        DestroyCube();
+
     }
+
+    public void DestroyCube()
+    {
+        Destroy (gameObject);
+    }
+
 
 }
