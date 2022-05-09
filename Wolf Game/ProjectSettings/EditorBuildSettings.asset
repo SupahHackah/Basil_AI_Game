@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Wolf Game/Alex/UI and Menu/MainMenu.unity
+    guid: 50b47614887ce3e448eba9f2164b8fe3
+  - enabled: 1
+    path: Assets/Wolf Game/Alex/Scenes/Alex.unity
+    guid: 190cf516d85cb5e43ac43e3656dc7f9b
   m_configObjects: {}
