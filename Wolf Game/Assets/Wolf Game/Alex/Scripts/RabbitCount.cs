@@ -11,7 +11,7 @@ public class RabbitCount : MonoBehaviour
     private GameObject rabbit;
     private string _text;
 
-    [SerializedField] private int rabbitCount;
+    [SerializeField] private int rabbitCount;
 
     void Awake()
     {
@@ -23,7 +23,7 @@ public class RabbitCount : MonoBehaviour
 
     void Start()
     {
-        _text = string("Rabbits Remaining" + rabbitCount);
+        _text = "Rabbits Remaining " + rabbitCount;
         //rabbitCount = rabbit.
     }
 
