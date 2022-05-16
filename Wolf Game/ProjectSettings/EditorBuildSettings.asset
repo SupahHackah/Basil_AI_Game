@@ -11,4 +11,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Wolf Game/Alex/Scenes/Alex.unity
     guid: 190cf516d85cb5e43ac43e3656dc7f9b
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 8d219c4b2a740274a81424e3f2d7b9fc, type: 2}

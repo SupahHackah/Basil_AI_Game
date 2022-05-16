@@ -28,8 +28,8 @@ public class Enemy_Ai_Manager : MonoBehaviour
 
     //Attacking
     public float timeBetweenAttacks;
-    public int health;
-    public int damage;
+    public float _enemy_health;
+    public float _take_damage;
 
     //Bools
     //Detection Variables
@@ -242,6 +242,18 @@ public class Enemy_Ai_Manager : MonoBehaviour
     private void ResetAttack()
     {
         alreadyAttacked = false;
+    }
+
+    public void _Enemy_TakeDamage()
+    {
+        _enemy_health -= _take_damage;
+
+        Debug.Log("Damage was inflicted");
+        if (_enemy_health <= 0)
+        {
+            Debug.Log("Killed");
+            Destroy(this.gameObject);
+        }
     }
 
 

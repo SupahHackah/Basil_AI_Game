@@ -12,27 +12,30 @@ public class PlayerHealthBar_Script : MonoBehaviour
     
 
     private float PlayerMaxHealth = 100f;
-    
 
-    Health_Script PlayerHP;
+
+    //Health_Script PlayerHP;
+
+    Fox_Movement fox;
 
    
     private void Awake() 
     {   
         //Find
         PlayerHealthBar = GetComponent<Image>();
-        PlayerHP = FindObjectOfType<Health_Script>();
+        //PlayerHP = FindObjectOfType<Health_Script>();
+        fox = FindObjectOfType<Fox_Movement>();
     }
 
     private void Start()
     {
-        PlayerMaxHealth = PlayerHP.PlayerHealth;
+        PlayerMaxHealth = fox.player_Health;
        
     }
 
     private void Update()
     {
-        PlayerCurrentHealth = PlayerHP.PlayerHealth;
+        PlayerCurrentHealth = fox.player_Health;
         
 
         PlayerHealthBar.fillAmount = PlayerCurrentHealth / PlayerMaxHealth;

@@ -5,9 +5,29 @@ using UnityEngine.InputSystem;
 
 public class CharacterMovement : MonoBehaviour
 {
+    // variable to store character animator component
+    Animator animator;
+
+    // variables to store optimized setter/getter parameter IDs
+    int isWalkingHash;
+    int isRunningHash;
+
+    // variable to store the instance of Test ( Action Input System )
+    Fox_Input input;
+
+    // variables to store player input values ( animations )
+    Vector2 currentMovement;
+    bool movementPressed;
+    bool runPressed;
+
+    //-------------------------------------------------------------------
+    //-------------------------------------------------------------------
+
+
     // Input fields
-    private CharacterActionAsset characterActionAsset;
+    //private CharacterActionAsset characterActionAsset;
     private InputAction move;
+
 
     // Layer Mask for Jumping
     [SerializeField] private LayerMask groundLayerMask;
@@ -36,43 +56,32 @@ public class CharacterMovement : MonoBehaviour
 
     private void Awake()
     {
+
+        input = new Fox_Input();
+
+        input.CharacterControls.Movement.performed += ctx =>
+        {
+            // set the player input values using listeners
+            currentMovement = ctx.ReadValue<Vector2>();
+            movementPressed = currentMovement.x != 0 || currentMovement.y != 0;
+        };
+        input.CharacterControls.Run.performed += ctx => runPressed = ctx.ReadValueAsButton();
+
+        //--------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------
+
         // Assign rigidbody and Input Action Asset
         rb = this.GetComponent<Rigidbody>();
 
-        characterActionAsset = new CharacterActionAsset();
-    }
+        //characterActionAsset = new CharacterActionAsset();
 
-
-    // here we have 3 options for calling actions. Either started, cancelled or performed.
-    // += to subscribe to an event -= to unsubscribe to an event
-    private void OnEnable()
-    {
-        // Action Asset         >   Action Map    >     Action  >   Action Call     >   Subscription    >   Method
-        // characterActionAsset .   BasicMovement .     Jump    .   started                 +=              DoJump;
         
-        // List of actions from Action Map BasicMovement
-        characterActionAsset.BasicMovement.Jump.started += DoJump;
-        characterActionAsset.BasicMovement.Sprint.started += DoSprint;
-        characterActionAsset.BasicMovement.Attack.started += DoAttack;
-        characterActionAsset.BasicMovement.Dodge.started += DoDodge;
-        characterActionAsset.BasicMovement.Interact.started += DoInteract;
-
-
-        move = characterActionAsset.BasicMovement.Movement;
-        characterActionAsset.BasicMovement.Enable();
     }
 
 
-    private void OnDisable()
+    private void Update()
     {
-        // List of actions 
-        characterActionAsset.BasicMovement.Jump.started -= DoJump;
-        characterActionAsset.BasicMovement.Sprint.started -= DoSprint;
-        characterActionAsset.BasicMovement.Attack.started -= DoAttack;
-        characterActionAsset.BasicMovement.Dodge.started -= DoDodge;
-        characterActionAsset.BasicMovement.Interact.started -= DoInteract;
-
-        characterActionAsset.BasicMovement.Disable();
+        handleAnimations();
     }
 
 
@@ -162,7 +171,7 @@ public class CharacterMovement : MonoBehaviour
     }
 
 
-    private void DoSprint(InputAction.CallbackContext obj)
+    private void DoRun(InputAction.CallbackContext obj)
     {
         Debug.Log("Sprinting");   
         if(!isSprinting)
@@ -197,5 +206,68 @@ public class CharacterMovement : MonoBehaviour
         
         
     }
-    
+
+    private void handleAnimations()
+    {
+        // get parameter values from animator
+        bool isWalking = animator.GetBool(isWalkingHash);
+        bool isRunning = animator.GetBool(isRunningHash);
+
+        // start walking if movement pressed is true and not already walking
+        if (movementPressed && !isWalking)
+        {
+            animator.SetBool(isWalkingHash, true);
+        }
+
+        //stop walking if movementPressed is false and not already walking
+        if (!movementPressed && isWalking)
+        {
+            animator.SetBool(isWalkingHash, false);
+        }
+
+        // start running if movement pressed and run pressed is true and not already running
+        if ((movementPressed && runPressed) && !isRunning)
+        {
+            animator.SetBool(isRunningHash, true);
+        }
+
+        // stop running if movement pressed or run pressed is false and currently running
+        //if ((!movementPressed && !runPressed) && isRunning)  This is for toggle to run
+        if ((movementPressed && !runPressed) && isRunning) //This is for hold to run
+        {
+            animator.SetBool(isRunningHash, false);
+        }
+    }
+
+    // here we have 3 options for calling actions. Either started, cancelled or performed.
+    // += to subscribe to an event -= to unsubscribe to an event
+    private void OnEnable()
+    {
+        // Action Asset         >   Action Map    >     Action  >   Action Call     >   Subscription    >   Method
+        // characterActionAsset .   BasicMovement .     Jump    .   started                 +=              DoJump;
+
+        // List of actions from Action Map BasicMovement
+        input.CharacterControls.Jump.started += DoJump;
+        input.CharacterControls.Run.started += DoRun;
+        input.CharacterControls.Attack.started += DoAttack;
+        input.CharacterControls.Dodge.started += DoDodge;
+        input.CharacterControls.Interact.started += DoInteract;
+
+        move = input.CharacterControls.Movement;
+        input.CharacterControls.Enable();
+    }
+
+
+    private void OnDisable()
+    {
+        // List of actions 
+        input.CharacterControls.Jump.started -= DoJump;
+        input.CharacterControls.Run.started -= DoRun;
+        input.CharacterControls.Attack.started -= DoAttack;
+        input.CharacterControls.Dodge.started -= DoDodge;
+        input.CharacterControls.Interact.started -= DoInteract;
+
+        input.CharacterControls.Disable();
+    }
+
 }

@@ -14,26 +14,26 @@ public class EnemyHealthBar_Script : MonoBehaviour
    
     private float EnemyMaxHealth = 100f;
 
-    Health_Script EnemyHP;
+    Enemy_Ai_Manager _enemy;
 
    
     private void Awake() 
     {   
         //Find
         EnemyHealthBar = GetComponent<Image>();
-        EnemyHP = FindObjectOfType<Health_Script>();
+        _enemy = FindObjectOfType<Enemy_Ai_Manager>();
     }
 
     private void Start()
     {
        
-        EnemyMaxHealth = EnemyHP.EnemyHealth;
+        EnemyMaxHealth = _enemy._enemy_health;
     }
 
     private void Update()
     {
         
-        EnemyCurrentHealth = EnemyHP.EnemyHealth;
+        EnemyCurrentHealth = _enemy._enemy_health;
 
        
         EnemyHealthBar.fillAmount = EnemyCurrentHealth / EnemyMaxHealth;
