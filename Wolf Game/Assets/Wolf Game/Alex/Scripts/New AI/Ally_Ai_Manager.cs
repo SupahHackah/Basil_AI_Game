@@ -32,7 +32,12 @@ public class Ally_Ai_Manager : MonoBehaviour
 
     //Attacking
     public float timeBetweenAttacks;
-    
+
+
+    //Health and Damage
+    public float _ally_health;
+    public float _take_damage;
+
 
     //Bools
     //Detection Variables
@@ -258,6 +263,19 @@ public class Ally_Ai_Manager : MonoBehaviour
     private void ResetAttack()
     {
         alreadyAttacked = false;
+    }
+
+
+    public void _Ally_TakeDamage()
+    {
+        _ally_health -= _take_damage;
+
+        Debug.Log("Damage was inflicted");
+        if (_ally_health <= 0)
+        {
+            Debug.Log("Killed");
+            Destroy(this.gameObject);
+        }
     }
 
     // Commands
