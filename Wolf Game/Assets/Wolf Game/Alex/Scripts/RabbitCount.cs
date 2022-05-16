@@ -23,16 +23,13 @@ public class RabbitCount : MonoBehaviour
 
     void Start()
     {
-        
+        _text = "Rabbits Remaining " + rabbitCount;
+        //rabbitCount = rabbit.
     }
 
     
     void Update()
     {
-        //rabbitCount = rabbit.
-
-        _text =("Rabbits Remaining:"+ " " + rabbitCount);
-
         textMesh.text = _text.ToString();
     }
 }
