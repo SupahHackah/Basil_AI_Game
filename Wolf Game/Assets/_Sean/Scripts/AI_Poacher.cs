@@ -9,18 +9,23 @@ public class AI_Poacher : MonoBehaviour
 
     [Space]
     public GameObject player;
+    [SerializeField] private LayerMask playerLayer;
     public GameObject[] waypoints;
+    Vector3 destination;
+
+    [Space]
+    public GameObject bulletPrefab;
+    public Transform bulletOrigin;
+    private float lastAttackTime = 0;
+    public float bulletSpeed = 100f;
 
     [Space]
     [SerializeField] float distanceToPlayer;
+    [SerializeField] float distanceToCamp;
+
 
     [Space]
-    public bool isIdle;
-    public bool isChasing;
-
-    [Space]
-    Animator anim;
-    int animState = 0; // 0 = Idle, 1 = Walk, 2 = Run, 3 = Shoot
+    Animator anim;//  INT [0] = Idle, [1] = Walk, [2] = Run, [3] = Shoot
 
 
     void Start()
@@ -36,34 +41,48 @@ public class AI_Poacher : MonoBehaviour
     void Update()
     {
 
+        distanceToCamp = Vector3.Distance(transform.position, destination);
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        
 
-        if (distanceToPlayer < 10f) //SHOOT AT PLAYER
+       
+       if(distanceToPlayer < 15f) //CHASE PLAYER
         {
-            Shoot();
-        }
-        else if(distanceToPlayer >= 10f &&  distanceToPlayer < 15f) //CHASE PLAYER
-        {
-            isChasing = true;
-            sprite.enabled = true;
             Seek(player.transform.position);
+
+            if (distanceToPlayer < 10f) //SHOOT AT PLAYER
+            {
+                Seek(transform.position);
+                Shoot();
+                return;
+            }
+            
         }
-        else // Go Hunting
+        
+        else if (distanceToCamp < 2f)// Go Hunting
         {
-            sprite.enabled = false;
-            isChasing = false;
             PickWayPoint();
         }
 
-        if (agent.remainingDistance < .25f)
-        {
-            anim.SetInteger("AnimIndex", 0);
-            StartCoroutine("Delay");
-            anim.SetInteger("AnimIndex", 1);
-            PickWayPoint();
-        }
-
+        
     }
+
+    void Seek(Vector3 location)
+    {
+        anim.SetInteger("AnimIndex", 2);
+
+        agent.SetDestination(location);
+    }
+
+    void PickWayPoint()
+    {
+        int randomWPNum;
+        randomWPNum = Random.Range(0, waypoints.Length-1);
+        destination = waypoints[randomWPNum].transform.position;
+        anim.SetInteger("AnimIndex", 1);
+        agent.SetDestination(destination);
+    }
+
 
     IEnumerator Delay()
     {
@@ -73,32 +92,27 @@ public class AI_Poacher : MonoBehaviour
     void Shoot()
     {
         anim.SetInteger("AnimIndex", 3);
-        Debug.Log("BANG BANG");
-    }
+        
 
-    void Seek(Vector3 location)
-    {
-        isChasing = true;
-        anim.SetInteger("AnimIndex", 2);
-
-        agent.SetDestination(location);
-    }
-
-    void PickWayPoint()
-    {
-        int randomWPNum;
-        randomWPNum = Random.Range(0, waypoints.Length);
-
-        anim.SetInteger("AnimIndex", 1);
-
-        agent.SetDestination(waypoints[randomWPNum].transform.position);
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.collider.tag == "Player" || other.collider.tag == "Ally")
+        RaycastHit hit;
+        if (Physics.Raycast(bulletOrigin.position, transform.forward, out hit, 100))
         {
-            Debug.Log(this + " HIT");
+            transform.rotation = Quaternion.LookRotation(player.transform.position - transform.position, transform.up);
+
+
+            if (Time.time - lastAttackTime >= 2)
+            {
+                Debug.Log("BANG BANG");
+                shootProjectile();
+                lastAttackTime = Time.time;
+            }
+
         }
+    }
+    void shootProjectile() 
+    {
+        var bullet = Instantiate(bulletPrefab, bulletOrigin.position, bulletOrigin.transform.rotation);
+        bullet.GetComponent<Rigidbody>().velocity += transform.forward * bulletSpeed *Time.deltaTime;
+        Destroy(bullet, 2);
     }
 }

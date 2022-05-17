@@ -20,9 +20,9 @@ public class AI_Prey : MonoBehaviour
     public bool isFleeing;
 
     [Space]
-    Animator anim;
-    int animState = 0; // 0 = Idle, 1 = Run, 2 = Dead;
+    Animator anim;  // INT AnimIndex [0] = Idle, [1] = Run, [2] = Dead;
 
+    int animState = 0;
 
     void Start()
     {
