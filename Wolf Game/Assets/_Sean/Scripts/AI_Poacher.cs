@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.AI;
 
-public class AI_Prey : MonoBehaviour
+public class AI_Poacher : MonoBehaviour
 {
     NavMeshAgent agent;
     SpriteRenderer sprite;
@@ -15,13 +15,12 @@ public class AI_Prey : MonoBehaviour
     [SerializeField] float distanceToPlayer;
 
     [Space]
-    public bool isAlert;
     public bool isIdle;
-    public bool isFleeing;
+    public bool isChasing;
 
     [Space]
     Animator anim;
-    int animState = 0; // 0 = Idle, 1 = Run, 2 = Dead;
+    int animState = 0; // 0 = Idle, 1 = Walk, 2 = Run, 3 = Shoot
 
 
     void Start()
@@ -30,7 +29,7 @@ public class AI_Prey : MonoBehaviour
         anim = GetComponent<Animator>();
         sprite = GetComponentInChildren<SpriteRenderer>();
         player = GameObject.Find("Player_Fox");
-        waypoints = GameObject.FindGameObjectsWithTag("Carrot");
+        waypoints = GameObject.FindGameObjectsWithTag("Waypoint");
         PickWayPoint();
     }
 
@@ -39,17 +38,24 @@ public class AI_Prey : MonoBehaviour
 
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
 
-        if (distanceToPlayer < 10f)
+        if (distanceToPlayer < 10f) //SHOOT AT PLAYER
         {
-            sprite.enabled = true;
-            Flee(player.transform.position);
+            Shoot();
         }
-        else
+        else if(distanceToPlayer >= 10f &&  distanceToPlayer < 15f) //CHASE PLAYER
+        {
+            isChasing = true;
+            sprite.enabled = true;
+            Seek(player.transform.position);
+        }
+        else // Go Hunting
         {
             sprite.enabled = false;
+            isChasing = false;
+            PickWayPoint();
         }
 
-        if(agent.remainingDistance < .5f)
+        if (agent.remainingDistance < .25f)
         {
             anim.SetInteger("AnimIndex", 0);
             StartCoroutine("Delay");
@@ -64,13 +70,21 @@ public class AI_Prey : MonoBehaviour
         yield return new WaitForSeconds(2);
     }
 
-    void Flee(Vector3 location)
+    void Shoot()
     {
-        Vector3 fleeVector = location - this.transform.position;
-        agent.SetDestination(this.transform.position - fleeVector);
+        anim.SetInteger("AnimIndex", 3);
+        Debug.Log("BANG BANG");
     }
 
-    void PickWayPoint() 
+    void Seek(Vector3 location)
+    {
+        isChasing = true;
+        anim.SetInteger("AnimIndex", 2);
+
+        agent.SetDestination(location);
+    }
+
+    void PickWayPoint()
     {
         int randomWPNum;
         randomWPNum = Random.Range(0, waypoints.Length);
