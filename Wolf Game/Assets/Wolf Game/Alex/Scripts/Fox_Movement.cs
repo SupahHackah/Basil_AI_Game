@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class Fox_Movement : MonoBehaviour
 {
+
+    public GameObject endscreen;
     // variable to store enemy ai script reference
     private Enemy_Ai_Manager _enemy;
     // variable to store character animator component
@@ -27,11 +29,9 @@ public class Fox_Movement : MonoBehaviour
     Vector2 currentMovement;
     bool movementPressed;
     bool runPressed;
-
     bool jumpPressed;
     bool dashPressed;
-
-    bool attackPressed;
+    public bool attackPressed;
     public bool dead;
 
 
@@ -40,6 +40,8 @@ public class Fox_Movement : MonoBehaviour
 
     // variable to store camera for character movement
     public Transform cam;
+    //Health STuff SEAN
+    public Health healthScript;
 
     // variables for character moveset
     public float speed = 3f;
@@ -77,7 +79,7 @@ public class Fox_Movement : MonoBehaviour
     float _targetAngle;
 
     // attack and death animation float variables
-    bool _attacked;
+    public bool _attacked;
     int attackNum;
     int deadNum;
 
@@ -120,6 +122,11 @@ public class Fox_Movement : MonoBehaviour
 
         isAttackingHash = Animator.StringToHash("isAttacking");
         isDeadHash = Animator.StringToHash("isDead");
+
+        //HealthStuff
+        healthScript = GetComponent<Health>();
+        healthScript.health = 12;
+        healthScript.MAX_HEALTH = 12;
 
     }
 
@@ -226,14 +233,12 @@ public class Fox_Movement : MonoBehaviour
         
 
         
-        if (player_Health <= 0)
+        if (healthScript.health <= 0)
         {
-            Debug.Log("Killed");
-            dead = true;
-            //Destroy(this.gameObject);
-        }
+            endscreen.SetActive(true);
 
-        if (dead)
+        }
+        else
         {
             deadNum = Random.Range(0, 11);
             //Debug.Log(deadNum);
@@ -246,7 +251,7 @@ public class Fox_Movement : MonoBehaviour
     public void playerTakeDamage()
     {
         player_Health -= player_Damage;
-        Debug.Log("Player Health:" + " " + player_Health);
+        Debug.Log("Player Health:  " + player_Health);
     }
 
 
@@ -423,5 +428,15 @@ public class Fox_Movement : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.tag == "Bullet")
+        {
+            Debug.Log("HIT");
+            healthScript.Damage(3);
+            Destroy(collider.gameObject);
+        }
     }
 }

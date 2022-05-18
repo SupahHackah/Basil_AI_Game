@@ -6,9 +6,11 @@ public class AI_Prey : MonoBehaviour
 {
     NavMeshAgent agent;
     SpriteRenderer sprite;
+    Health healthScript;
 
     [Space]
     public GameObject player;
+    private Fox_Movement playerScript;
     public GameObject[] waypoints;
 
     [Space]
@@ -22,41 +24,53 @@ public class AI_Prey : MonoBehaviour
     [Space]
     Animator anim;  // INT AnimIndex [0] = Idle, [1] = Run, [2] = Dead;
 
-    int animState = 0;
-
     void Start()
     {
         agent = this.GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         sprite = GetComponentInChildren<SpriteRenderer>();
         player = GameObject.Find("Player_Fox");
+        healthScript = GetComponent<Health>();
+        healthScript.health = 9;
+        healthScript.MAX_HEALTH = 9;
         waypoints = GameObject.FindGameObjectsWithTag("Carrot");
         PickWayPoint();
     }
 
     void Update()
     {
+        sprite.transform.LookAt(Camera.main.transform);
 
-        distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-
-        if (distanceToPlayer < 10f)
+        if (healthScript.health <= 0)
         {
-            sprite.enabled = true;
-            Flee(player.transform.position);
+            agent.enabled = false;
+            anim.SetInteger("AnimIndex", 2);
+            Destroy(gameObject, 1.5f);
+            player.GetComponent<Health>().Heal(2);
+
         }
         else
         {
-            sprite.enabled = false;
-        }
+            distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
 
-        if(agent.remainingDistance < .5f)
-        {
-            anim.SetInteger("AnimIndex", 0);
-            StartCoroutine("Delay");
-            anim.SetInteger("AnimIndex", 1);
-            PickWayPoint();
-        }
+            if (distanceToPlayer < 10f && agent.enabled == true)
+            {
+                sprite.enabled = true;
+                Flee(player.transform.position);
+            }
+            else
+            {
+                sprite.enabled = false;
+            }
 
+            if (agent.remainingDistance < .5f && agent.enabled == true)
+            {
+                anim.SetInteger("AnimIndex", 0);
+                StartCoroutine("Delay");
+                anim.SetInteger("AnimIndex", 1);
+                PickWayPoint();
+            }
+        }
     }
 
     IEnumerator Delay()
@@ -68,6 +82,7 @@ public class AI_Prey : MonoBehaviour
     {
         Vector3 fleeVector = location - this.transform.position;
         agent.SetDestination(this.transform.position - fleeVector);
+        agent.speed = 1;
     }
 
     void PickWayPoint() 
@@ -76,15 +91,8 @@ public class AI_Prey : MonoBehaviour
         randomWPNum = Random.Range(0, waypoints.Length);
 
         anim.SetInteger("AnimIndex", 1);
-
+        agent.speed = 3;
         agent.SetDestination(waypoints[randomWPNum].transform.position);
     }
 
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.collider.tag == "Player" || other.collider.tag == "Ally")
-        {
-            Debug.Log(this + " HIT");
-        }
-    }
 }

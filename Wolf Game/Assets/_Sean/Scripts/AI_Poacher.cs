@@ -6,6 +6,7 @@ public class AI_Poacher : MonoBehaviour
 {
     NavMeshAgent agent;
     SpriteRenderer sprite;
+    Health healthScript;
 
     [Space]
     public GameObject player;
@@ -14,8 +15,9 @@ public class AI_Poacher : MonoBehaviour
     Vector3 destination;
 
     [Space]
-    public GameObject bulletPrefab;
+    public GameObject bullet;
     public Transform bulletOrigin;
+    private Vector3 direction;
     private float lastAttackTime = 0;
     public float bulletSpeed = 100f;
 
@@ -32,39 +34,36 @@ public class AI_Poacher : MonoBehaviour
     {
         agent = this.GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
-        sprite = GetComponentInChildren<SpriteRenderer>();
         player = GameObject.Find("Player_Fox");
         waypoints = GameObject.FindGameObjectsWithTag("Waypoint");
-        PickWayPoint();
+                PickWayPoint();
     }
 
     void Update()
     {
-
         distanceToCamp = Vector3.Distance(transform.position, destination);
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-        
+        direction = (player.transform.position - bulletOrigin.position);
 
-       
-       if(distanceToPlayer < 15f) //CHASE PLAYER
+
+        if (distanceToPlayer <= 10f) //SHOOT AT PLAYER
         {
-            Seek(player.transform.position);
-
-            if (distanceToPlayer < 10f) //SHOOT AT PLAYER
-            {
-                Seek(transform.position);
-                Shoot();
-                return;
-            }
-            
+            Seek(transform.position);
+            Shoot();
+            return;
         }
-        
+        else if (distanceToPlayer < 15f || distanceToPlayer>10) //CHASE PLAYER
+        {
+            agent.enabled = true;
+            Seek(player.transform.position);                        
+        }
         else if (distanceToCamp < 2f)// Go Hunting
         {
             PickWayPoint();
         }
 
-        
+
+
     }
 
     void Seek(Vector3 location)
@@ -91,17 +90,16 @@ public class AI_Poacher : MonoBehaviour
 
     void Shoot()
     {
-        anim.SetInteger("AnimIndex", 3);
-        
-
+        Debug.DrawRay(bulletOrigin.position, transform.forward, Color.green);
         RaycastHit hit;
-        if (Physics.Raycast(bulletOrigin.position, transform.forward, out hit, 100))
+        if (Physics.Raycast(bulletOrigin.position, transform.forward, out hit))
         {
             transform.rotation = Quaternion.LookRotation(player.transform.position - transform.position, transform.up);
-
+            
 
             if (Time.time - lastAttackTime >= 2)
             {
+                anim.SetInteger("AnimIndex", 3);
                 Debug.Log("BANG BANG");
                 shootProjectile();
                 lastAttackTime = Time.time;
@@ -111,8 +109,9 @@ public class AI_Poacher : MonoBehaviour
     }
     void shootProjectile() 
     {
-        var bullet = Instantiate(bulletPrefab, bulletOrigin.position, bulletOrigin.transform.rotation);
-        bullet.GetComponent<Rigidbody>().velocity += transform.forward * bulletSpeed *Time.deltaTime;
-        Destroy(bullet, 2);
+        //bulletOrigin.transform.LookAt(player.transform);
+        GameObject b =Instantiate(bullet, bulletOrigin.position, bulletOrigin.transform.rotation);
+        b.GetComponent<Rigidbody>().AddForce(direction * bulletSpeed);
+        Destroy(b, 5);
     }
 }
