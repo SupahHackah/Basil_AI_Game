@@ -31,7 +31,7 @@ public class Fox_Movement : MonoBehaviour
     bool jumpPressed;
     bool dashPressed;
 
-    bool attackPressed;
+    public bool attackPressed;
     public bool dead;
 
 
@@ -77,7 +77,7 @@ public class Fox_Movement : MonoBehaviour
     float _targetAngle;
 
     // attack and death animation float variables
-    bool _attacked;
+    public bool _attacked;
     int attackNum;
     int deadNum;
 
@@ -246,7 +246,7 @@ public class Fox_Movement : MonoBehaviour
     public void playerTakeDamage()
     {
         player_Health -= player_Damage;
-        Debug.Log("Player Health:" + " " + player_Health);
+        Debug.Log("Player Health:  " + player_Health);
     }
 
 
