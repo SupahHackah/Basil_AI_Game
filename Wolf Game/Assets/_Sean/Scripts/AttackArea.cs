@@ -8,10 +8,10 @@ public class AttackArea : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.GetComponent<Health>() != null && collider.tag != "Player")
+        if (collider.GetComponent<Health>() != null && collider.tag != "Player" )
         {
-            Health health = collider.GetComponent<Health>();
-            health.Damage(damage);
+            Health otherhealth = collider.GetComponent<Health>();
+            otherhealth.Damage(damage);
         }
     }
 }

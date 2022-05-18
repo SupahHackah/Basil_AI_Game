@@ -6,8 +6,7 @@ using UnityEngine.UI;
 public class Health : MonoBehaviour
 {
     [SerializeField] public int health = 9;
-
-    private int MAX_HEALTH = 9;
+    public int MAX_HEALTH = 9;
 
     [Space]
     public Slider slider;

@@ -31,18 +31,22 @@ public class AI_Prey : MonoBehaviour
         sprite = GetComponentInChildren<SpriteRenderer>();
         player = GameObject.Find("Player_Fox");
         healthScript = GetComponent<Health>();
-
+        healthScript.health = 9;
+        healthScript.MAX_HEALTH = 9;
         waypoints = GameObject.FindGameObjectsWithTag("Carrot");
         PickWayPoint();
     }
 
     void Update()
     {
+        sprite.transform.LookAt(Camera.main.transform);
+
         if (healthScript.health <= 0)
         {
             agent.enabled = false;
             anim.SetInteger("AnimIndex", 2);
             Destroy(gameObject, 1.5f);
+            player.GetComponent<Health>().Heal(2);
 
         }
         else

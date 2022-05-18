@@ -6,6 +6,7 @@ public class AI_Poacher : MonoBehaviour
 {
     NavMeshAgent agent;
     SpriteRenderer sprite;
+    Health healthScript;
 
     [Space]
     public GameObject player;
@@ -33,15 +34,13 @@ public class AI_Poacher : MonoBehaviour
     {
         agent = this.GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
-        sprite = GetComponentInChildren<SpriteRenderer>();
         player = GameObject.Find("Player_Fox");
         waypoints = GameObject.FindGameObjectsWithTag("Waypoint");
-        PickWayPoint();
+                PickWayPoint();
     }
 
     void Update()
     {
-
         distanceToCamp = Vector3.Distance(transform.position, destination);
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
         direction = (player.transform.position - bulletOrigin.position);
@@ -60,11 +59,11 @@ public class AI_Poacher : MonoBehaviour
         }
         else if (distanceToCamp < 2f)// Go Hunting
         {
-            agent.enabled = true;
             PickWayPoint();
         }
 
-        
+
+
     }
 
     void Seek(Vector3 location)

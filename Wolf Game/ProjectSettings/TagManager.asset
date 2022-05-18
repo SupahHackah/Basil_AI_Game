@@ -9,6 +9,7 @@ TagManager:
   - Waypoint
   - Prey
   - Carrot
+  - Bullet
   layers:
   - Default
   - TransparentFX
